@@ -119,6 +119,9 @@ def run_check(tab_widgets):
     name = extract_name(text)
     tab_label = format_tab_label(name, all_passed)
     notebook.tab(tab_widgets["frame"], text=tab_label)
+    tab_widgets["last_results"] = results
+    tab_widgets["last_name"] = name
+    tab_widgets["last_all_passed"] = all_passed
 
 
 # -------------------------
@@ -153,6 +156,9 @@ def create_tab(title=None):
         "input_text": input_text,
         "results_frame": None,
         "missing_list": None,
+        "last_results": None,
+        "last_name": None,
+        "last_all_passed": None,
     }
 
     tk.Button(
@@ -182,6 +188,52 @@ def add_tab():
     create_tab()
 
 
+def create_report():
+    # Ensure each tab has up-to-date results
+    for tab in tabs:
+        run_check(tab)
+
+    lines = []
+    for idx, tab in enumerate(tabs):
+        name = tab.get("last_name") or "Unknown"
+        lines.append(name)
+
+        results = tab.get("last_results") or {}
+        all_passed = tab.get("last_all_passed")
+        missing = [t for t, ok in results.items() if not ok]
+
+        if all_passed:
+            lines.append("All EH&S trainings completed")
+        else:
+            if missing:
+                lines.append("Missing EH&S Trainings:")
+                for m in missing:
+                    lines.append(f"- {m}")
+
+        if idx < len(tabs) - 1:
+            lines.append("")
+
+    report_text = "\n".join(lines)
+
+    popup = tk.Toplevel(root)
+    popup.title("Report Summary")
+    popup.geometry("520x400")
+
+    tk.Label(popup, text="Report Summary", font=("Arial", 11, "bold")).pack(anchor="w", padx=10, pady=8)
+
+    txt = tk.Text(popup, wrap="word")
+    txt.pack(fill="both", expand=True, padx=10, pady=(0, 8))
+    txt.insert("1.0", report_text)
+    txt.configure(state="normal")
+
+    def copy_to_clipboard():
+        root.clipboard_clear()
+        root.clipboard_append(report_text)
+
+    tk.Button(popup, text="Copy to Clipboard", command=copy_to_clipboard, font=("Arial", 10, "bold")).pack(pady=(0, 10))
+
+
+tk.Button(top_bar, text="Create Report", command=create_report, font=("Arial", 11, "bold")).pack(side="left", padx=(0, 8))
 tk.Button(top_bar, text="➕ New Tab", command=add_tab, font=("Arial", 11, "bold")).pack(side="left")
 
 # Start with one tab
