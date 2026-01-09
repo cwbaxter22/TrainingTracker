@@ -16,6 +16,18 @@ REQUIRED_TRAININGS = [
     "Managing Laboratory Chemicals Online",
 ]
 
+TRAINING_URLS = {
+    "Electrical Safety Awareness Online": "https://www.ehs.washington.edu/training/electrical-safety-basic-online",
+    "Fire Extinguisher Training Online": "https://www.ehs.washington.edu/training/fire-extinguisher-training-online",
+    "Asbestos General Awareness Online": "https://www.ehs.washington.edu/training/asbestos-general-awareness-online",
+    "Ladder Safety Online": "https://www.ehs.washington.edu/training/ladder-safety-%E2%80%93-online",
+    "Lockout Tagout Awareness Online": "https://ehs.washington.edu/training/lockout-tagout-refresher-%E2%80%93-online",
+    "Confined Space Entry Awareness Online": "https://ehs.washington.edu/training/confined-spaces-awareness-online",
+    "Lead Awareness Online": "https://www.ehs.washington.edu/training/lead-awareness-%E2%80%93-online",
+    "Globally Harmonized System for Hazard Communication Online": "https://www.ehs.washington.edu/training/ghs-hazcom-hazard-communication-online",
+    "Managing Laboratory Chemicals Online": "https://www.ehs.washington.edu/training/managing-laboratory-chemicals-online",
+}
+
 # -------------------------
 # CORE PARSING FUNCTION
 # -------------------------
@@ -208,7 +220,11 @@ def create_report():
             if missing:
                 lines.append("Missing EH&S Trainings:")
                 for m in missing:
-                    lines.append(f"- {m}")
+                    url = TRAINING_URLS.get(m, "")
+                    if url:
+                        lines.append(f"- {m}: {url}")
+                    else:
+                        lines.append(f"- {m}")
 
         if idx < len(tabs) - 1:
             lines.append("")
